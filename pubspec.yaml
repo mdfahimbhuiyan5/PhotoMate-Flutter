@@ -37,7 +37,12 @@ dependencies:
   firebase_core: ^3.9.0
   firebase_auth: ^5.3.4
   logger: ^1.1.0
-
+  cloud_firestore: ^5.6.2
+  image_picker: ^1.1.2
+  firebase_storage: ^12.4.1
+  file_picker: ^8.3.1
+  path: ^1.8.0
+  cached_network_image: ^3.4.1
 
 dev_dependencies:
   flutter_test:
@@ -60,6 +65,9 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  assets:
+    - assets/default_profile_pic.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

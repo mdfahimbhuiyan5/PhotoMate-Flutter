@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'photographers_page.dart'; // Import photographers page
+import 'profile_page.dart'; // Import ProfilePage from lib
 
 class HomeContent extends StatefulWidget {
   const HomeContent({super.key});
@@ -13,9 +14,9 @@ class _HomeContentState extends State<HomeContent> {
 
   // List of pages for navigation
   final List<Widget> _pages = [
-    const HomeScreen(), // Home page
-    const PhotographersPage(), // Photographers page
-    Container(), // Empty container for profile page (or you can later add your profile page)
+    HomeScreen(), // Home page (no const here)
+    PhotographersPage(), // Photographers page (no const here)
+    ProfilePage(), // Connected Profile tab to ProfilePage from lib
   ];
 
   void _onItemTapped(int index) {

@@ -4,6 +4,7 @@ import 'home_content.dart'; // Import HomeContent directly from lib
 import 'photographers_page.dart'; // Import PhotographersPage directly from lib
 import 'screens/login_screen.dart'; // Import the LoginScreen
 import 'screens/signup_screen.dart'; // Correct import for the SignUpScreen
+import 'profile_page.dart'; // Correct import for ProfilePage from lib
 
 void main() async {
   WidgetsFlutterBinding
@@ -51,12 +52,7 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> _pages = [
     HomeContent(),
     PhotographersPage(),
-    Center(
-      child: Text(
-        'Profile',
-        style: TextStyle(color: Colors.white, fontSize: 24),
-      ),
-    ),
+    ProfilePage(), // Connected Profile tab to ProfilePage from lib
   ];
 
   @override
