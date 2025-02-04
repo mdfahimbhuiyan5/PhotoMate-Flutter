@@ -140,18 +140,19 @@ class PhotographersPage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          height: 180,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white, width: 2),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.network(
-                              photographer["image"]!,
-                              fit: BoxFit.cover,
-                              width: double.infinity,
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.white, width: 2),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.network(
+                                photographer["image"]!,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                              ),
                             ),
                           ),
                         ),
@@ -226,7 +227,9 @@ class PhotographerDetailsPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const PortfolioPage(),
+                    builder: (context) => PortfolioPage(
+                      photographerName: photographerName,
+                    ),
                   ),
                 );
               },
@@ -263,22 +266,6 @@ class PhotographerDetailsPage extends StatelessWidget {
     );
   }
 }
-
-/*class PortfolioPage extends StatelessWidget {
-  const PortfolioPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Portfolio'),
-      ),
-      body: const Center(
-        child: Text('Portfolio Content Here'),
-      ),
-    );
-  }
-}*/
 
 class AdminActions extends StatelessWidget {
   const AdminActions({super.key});
@@ -385,13 +372,7 @@ class AddPhotographerForm extends StatelessWidget {
             );
             Navigator.pop(context);
           },
-          child: const Text('Add'),
-        ),
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: const Text('Cancel'),
+          child: const Text('Add Photographer'),
         ),
       ],
     );
@@ -400,18 +381,17 @@ class AddPhotographerForm extends StatelessWidget {
 
 class EditPhotographerForm extends StatelessWidget {
   final QueryDocumentSnapshot photographer;
-  final nameController = TextEditingController();
-  final bioController = TextEditingController();
-  final imageController = TextEditingController();
+  final nameController;
+  final bioController;
+  final imageController;
 
-  EditPhotographerForm({super.key, required this.photographer});
+  EditPhotographerForm({super.key, required this.photographer})
+      : nameController = TextEditingController(text: photographer['name']),
+        bioController = TextEditingController(text: photographer['bio']),
+        imageController = TextEditingController(text: photographer['image']);
 
   @override
   Widget build(BuildContext context) {
-    nameController.text = photographer['name'];
-    bioController.text = photographer['bio'];
-    imageController.text = photographer['image'];
-
     return AlertDialog(
       title: const Text('Edit Photographer'),
       content: Column(
@@ -442,13 +422,7 @@ class EditPhotographerForm extends StatelessWidget {
             );
             Navigator.pop(context);
           },
-          child: const Text('Save Changes'),
-        ),
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: const Text('Cancel'),
+          child: const Text('Update Photographer'),
         ),
       ],
     );
