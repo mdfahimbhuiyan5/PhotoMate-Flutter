@@ -1,307 +1,226 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-import 'utils.dart';
-
-void main() {
-  runApp(const MainApp());
-}
-
-// Please like and subscribe
-// thank you!!!!
-
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class PortfolioPage extends StatefulWidget {
+  const PortfolioPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.deepPurple),
-      home: const ProfilePage(),
-    );
+  _PortfolioPageState createState() => _PortfolioPageState();
+}
+
+class _PortfolioPageState extends State<PortfolioPage> {
+  final TextEditingController imageUrlController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+
+  /// Adds a new portfolio image to Firestore.
+  Future<void> addPortfolioImage(String imageUrl, String description) async {
+    try {
+      await FirebaseFirestore.instance.collection('portfolio').add({
+        'imageUrl': imageUrl,
+        'description': description,
+        'uploadedAt': Timestamp.now(),
+      });
+    } catch (e) {
+      debugPrint("Error adding portfolio image: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Failed to upload image.")),
+      );
+    }
   }
-}
-
-
-
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
-
-  @override
-  State<ProfilePage> createState() => _ProfilePageState();
-}
-
-class _ProfilePageState extends State<ProfilePage> {
-  bool _isGallerySelected = true;
-  int _currentIndex = 1;
 
   @override
   Widget build(BuildContext context) {
+    // Check if the current user is admin.
+    final currentUser = FirebaseAuth.instance.currentUser;
+    bool isAdmin = currentUser != null && currentUser.email == 'hey@gmail.com';
+
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(children: [
-        Positioned(
-          top: 225,
-          left: 0,
-          right: 0,
-          child: Column(
-            children: [
-              const Text(
-                'Sarah Mrylin',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
-              ),
-              const SizedBox(
-                height: 5,
-              ),
-              const Text(
-                'Photographer',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black12),
-              ),
-              SizedBox(
-                height: 80,
-                width: 250,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    statColumn('68', 'Shots'),
-                    statColumn('1.2K', 'Followers'),
-                    statColumn('90', 'Following'),
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(100))),
-                  child: const Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 110.0, vertical: 16),
-                    child: Text(
-                      'Follow',
-                      style: TextStyle(fontSize: 14),
-                    ),
-                  )),
-              const SizedBox(
-                height: 20,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  InkWell(
-                    onTap: () {
-                      setState(() {
-                        _isGallerySelected = !_isGallerySelected;
-                      });
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 30, vertical: 5),
-                      child: Column(
-                        children: [
-                          Text(
-                            'Gallery',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: _isGallerySelected
-                                  ? Colors.deepPurple
-                                  : Colors.deepPurple.shade100,
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 6,
-                          ),
-                          CircleAvatar(
-                            backgroundColor: _isGallerySelected
-                                ? Colors.deepPurple
-                                : Colors.transparent,
-                            radius: 3,
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      setState(() {
-                        _isGallerySelected = !_isGallerySelected;
-                      });
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 30, vertical: 5),
-                      child: Column(
-                        children: [
-                          Text(
-                            'Collection',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: _isGallerySelected
-                                  ? Colors.deepPurple.shade100
-                                  : Colors.deepPurple,
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 6,
-                          ),
-                          CircleAvatar(
-                            backgroundColor: _isGallerySelected
-                                ? Colors.transparent
-                                : Colors.deepPurple,
-                            radius: 3,
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              )
-            ],
-          ),
-        ),
-        Positioned(
-          top: -60,
-          left: 0,
-          right: 0,
-          child: ClipPath(
-            clipper: OvalBottomClipper(),
-            child: Image.asset('assets/images/girl_back.jpg'),
-          ),
-        ),
-        Positioned(
-          top: 465,
-          right: 25,
-          left: 25,
-          bottom: 0,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 25),
-            child: GridView.count(
-              padding: const EdgeInsets.symmetric(vertical: 5),
-              crossAxisCount: 3,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              children: List.generate(9, (index) {
-                return Container(
-                  width: 100,
-                  decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.all(Radius.circular(10)),
-                      image: DecorationImage(
-                          fit: BoxFit.cover,
-                          image: Image.asset('assets/images/img$index.jpg')
-                              .image)),
-                );
-              }),
-            ),
-          ),
-        ),
-        Positioned(
-          top: 30,
-          left: 20,
-          right: 20,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.arrow_back,
-                    size: 35,
-                    color: Colors.white,
-                  )),
-              Stack(
-                children: [
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.message_rounded,
-                      size: 35,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 10,
-                    right: 4,
-                    child: Container(
-                      padding: const EdgeInsets.all(3),
-                      decoration: const BoxDecoration(
-                          shape: BoxShape.circle, color: Colors.white),
-                      child: const CircleAvatar(
-                        backgroundColor: Colors.deepPurple,
-                        radius: 4,
-                      ),
-                    ),
-                  ),
-                ],
-              )
-            ],
-          ),
-        ),
-        Positioned(
-          top: 100,
-          left: 0,
-          right: 0,
-          child: CircleAvatar(
-            radius: 56,
-            backgroundColor: const Color(0xFFEAE1F8),
-            child: CircleAvatar(
-              radius: 50,
-              backgroundImage:
-                  Image.asset('assets/images/girl_portrait.jpg').image,
-            ),
-          ),
-        )
-      ]),
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        currentIndex: _currentIndex,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        items: const [
-          BottomNavigationBarItem(
-              icon: Icon(
-                Icons.camera,
-              ),
-              label: "Pictures"),
-          BottomNavigationBarItem(
-              icon: Icon(
-                Icons.person,
-              ),
-              label: "Person"),
-        ],
+      backgroundColor: Colors.grey[900],
+      appBar: AppBar(
+        title: const Text('Portfolio'),
+        centerTitle: true,
+        backgroundColor: Colors.black87,
+        elevation: 2,
       ),
-    );
-  }
-
-  Column statColumn(String total, String statName) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          total,
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
-        ),
-        const SizedBox(
-          height: 4,
-        ),
-        Text(
-          statName,
-          style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              color: Color(0x2c000000)),
-        ),
-      ],
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('portfolio')
+            .orderBy('uploadedAt', descending: true)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          var images = snapshot.data!.docs;
+          if (images.isEmpty) {
+            return const Center(
+              child: Text(
+                'No images uploaded yet.',
+                style: TextStyle(fontSize: 18, color: Colors.white70),
+              ),
+            );
+          }
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: GridView.builder(
+              itemCount: images.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 0.8,
+              ),
+              itemBuilder: (context, index) {
+                var imageDoc = images[index];
+                return Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  elevation: 6,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      FadeInImage.assetNetwork(
+                        placeholder: 'assets/placeholder.png',
+                        image: imageDoc['imageUrl'],
+                        fit: BoxFit.cover,
+                        imageErrorBuilder: (context, error, stackTrace) {
+                          return const Center(
+                              child: Icon(Icons.broken_image,
+                                  size: 40, color: Colors.white54));
+                        },
+                      ),
+                      if (imageDoc['description'] != null &&
+                          imageDoc['description'].toString().isNotEmpty)
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Container(
+                            width: double.infinity,
+                            color: Colors.black54,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 6, horizontal: 8),
+                            child: Text(
+                              imageDoc['description'],
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      ),
+      // Only show the FAB if the current user is the admin.
+      floatingActionButton: isAdmin
+          ? FloatingActionButton(
+              backgroundColor: Colors.blueAccent,
+              elevation: 6,
+              child: const Icon(Icons.add, size: 30),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    backgroundColor: Colors.grey[850],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    title: const Text(
+                      "Add Portfolio Image",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextField(
+                          controller: imageUrlController,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            labelText: "Image URL",
+                            labelStyle: const TextStyle(color: Colors.white70),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide:
+                                  const BorderSide(color: Colors.white38),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide:
+                                  const BorderSide(color: Colors.blueAccent),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: descriptionController,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            labelText: "Description (optional)",
+                            labelStyle: const TextStyle(color: Colors.white70),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide:
+                                  const BorderSide(color: Colors.white38),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide:
+                                  const BorderSide(color: Colors.blueAccent),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          // Ensure the image URL is not empty.
+                          if (imageUrlController.text.trim().isNotEmpty) {
+                            addPortfolioImage(
+                              imageUrlController.text.trim(),
+                              descriptionController.text.trim(),
+                            );
+                            imageUrlController.clear();
+                            descriptionController.clear();
+                            Navigator.pop(context);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Please enter an image URL.")),
+                            );
+                          }
+                        },
+                        child: const Text(
+                          "Upload",
+                          style: TextStyle(
+                              color: Colors.blueAccent,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text(
+                          "Cancel",
+                          style: TextStyle(color: Colors.white70),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            )
+          : null,
     );
   }
 }
