@@ -1,4 +1,5 @@
 # photomate
+
 # PhotoMates IIUM
  Group name: Educ8
 
@@ -244,24 +245,3 @@ Preparation Period: 25 January 2025 – 29 January 2025
 5. OpenAI (2024). Features that can be improved. https://chatgpt.com
 6. V. Pham (2024). Guide to Mobile Application Development. https://kms-solutions.asia/blogs/an-ultimate-guide-to-mobile-application-development
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-#   P h o t o M a t e 
- 
- #   P h o t o M a t e _ P r o j e c t 
- 
- #   P h o t o M a t e _ P r o j e c t 
- 
- "# PhotoMate-Flutter" 
