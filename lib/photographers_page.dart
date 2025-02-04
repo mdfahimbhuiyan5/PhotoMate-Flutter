@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:photomate/booking.dart';
+import 'package:photomate/portfolio.dart';
 
 Future<User?> signInAdmin() async {
   try {
@@ -263,7 +264,7 @@ class PhotographerDetailsPage extends StatelessWidget {
   }
 }
 
-class PortfolioPage extends StatelessWidget {
+/*class PortfolioPage extends StatelessWidget {
   const PortfolioPage({super.key});
 
   @override
@@ -277,7 +278,7 @@ class PortfolioPage extends StatelessWidget {
       ),
     );
   }
-}
+}*/
 
 class AdminActions extends StatelessWidget {
   const AdminActions({super.key});
@@ -338,7 +339,7 @@ class AdminActions extends StatelessWidget {
                   ],
                 ),
               );
-            }).toList(),
+            }),
           ],
         );
       },
@@ -350,6 +351,8 @@ class AddPhotographerForm extends StatelessWidget {
   final nameController = TextEditingController();
   final bioController = TextEditingController();
   final imageController = TextEditingController();
+
+  AddPhotographerForm({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -401,7 +404,7 @@ class EditPhotographerForm extends StatelessWidget {
   final bioController = TextEditingController();
   final imageController = TextEditingController();
 
-  EditPhotographerForm({required this.photographer});
+  EditPhotographerForm({super.key, required this.photographer});
 
   @override
   Widget build(BuildContext context) {
