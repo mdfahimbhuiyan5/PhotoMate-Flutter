@@ -43,6 +43,7 @@ dependencies:
   file_picker: ^8.3.1
   path: ^1.8.0
   cached_network_image: ^3.4.1
+  carousel_slider: ^5.0.0
 
 dev_dependencies:
   flutter_test:
