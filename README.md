@@ -1,4 +1,5 @@
 # photomate
+p/s: since we don't know how to integrated together all the codes and causes lots of errors. We decided to create new repo to finalized all the codes to ensure there's no error to connect with database.
 
 # PhotoMates IIUM
  Group name: Educ8
