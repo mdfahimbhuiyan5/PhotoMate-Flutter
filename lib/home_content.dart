@@ -1,48 +1,158 @@
 import 'package:flutter/material.dart';
-import 'photographers_page.dart'; // Import photographers page
-import 'profile_page.dart'; // Import ProfilePage from lib
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:photomate/photographers_page.dart';
+import 'package:photomate/profile_page.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
-class HomeContent extends StatefulWidget {
-  const HomeContent({super.key});
-
-  @override
-  State<HomeContent> createState() => _HomeContentState();
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(const MyApp());
 }
 
-class _HomeContentState extends State<HomeContent> {
-  int _selectedIndex = 0;
-
-  // List of pages for navigation
-  final List<Widget> _pages = [
-    HomeScreen(), // Home page (no const here)
-    PhotographersPage(), // Photographers page (no const here)
-    ProfilePage(), // Connected Profile tab to ProfilePage from lib
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: const HomeContent(),
+    );
+  }
+}
+
+class HomeContent extends StatelessWidget {
+  const HomeContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    const Color myBlueGrey = Color(0xFF37474F);
+    const String backgroundImage =
+        'https://images.pexels.com/photos/248519/pexels-photo-248519.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2';
+
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(
-        title: const Text('PhotoMate IIUM'),
-        backgroundColor: Colors.black,
-        elevation: 0,
-      ),
-      body: _pages[_selectedIndex], // Display the selected page
+      body: Stack(
+        children: [
+          Opacity(
+            opacity: 0.3,
+            child: Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(backgroundImage),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Featured Photographers',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const PhotographersPage()),
+                        );
+                      },
+                      child: const Text(
+                        'See More',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('photographers')
+                      .limit(6)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
 
+                    var photographers = snapshot.data!.docs;
+                    return GridView.builder(
+                      padding: const EdgeInsets.all(8),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        childAspectRatio: 0.75,
+                      ),
+                      itemCount: photographers.length,
+                      itemBuilder: (context, index) {
+                        var photographer = photographers[index];
+
+                        return Card(
+                          color: myBlueGrey.withOpacity(0.8),
+                          margin: const EdgeInsets.all(4),
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(6),
+                                  child: Image.network(
+                                    photographer["image"],
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8),
+                                child: Text(
+                                  photographer["name"],
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+              const RandomImageSlideshow(),
+            ],
+          ),
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
         backgroundColor: Colors.black,
         selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.grey,
-        items: const <BottomNavigationBarItem>[
+        unselectedItemColor: Colors.white70,
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
@@ -56,109 +166,57 @@ class _HomeContentState extends State<HomeContent> {
             label: 'Profile',
           ),
         ],
+        onTap: (index) {
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const PhotographersPage()),
+            );
+          } else if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ProfilePage()),
+            );
+          }
+        },
       ),
     );
   }
 }
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class RandomImageSlideshow extends StatelessWidget {
+  const RandomImageSlideshow({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 20),
-            const Text(
-              'Welcome to PhotoMate IIUM',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              'Explore photographers and manage your profile.',
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Featured Photographers',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              height: 200,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: 5,
-                itemBuilder: (context, index) {
-                  return Container(
-                    margin: const EdgeInsets.only(right: 16),
-                    width: 150,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade800,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Photographer ${index + 1}',
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Recent Photos',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 10),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-              ),
-              itemCount: 6,
-              itemBuilder: (context, index) {
-                return Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade800,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Photo ${index + 1}',
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
+    final List<String> images = [
+      'https://images.pexels.com/photos/821749/pexels-photo-821749.jpeg',
+      'https://images.pexels.com/photos/814830/pexels-photo-814830.jpeg',
+      'https://images.unsplash.com/photo-1453728013993-6d66e9c9123a',
+      'https://davidlazarphoto.com/amp/wp-content/uploads/2014/09/David-Lazar10.jpg',
+      'https://davidlazarphoto.com/amp/wp-content/uploads/2014/09/David-Lazar20.jpg',
+    ];
+
+    return CarouselSlider(
+      options: CarouselOptions(
+        height: 200,
+        autoPlay: true,
+        autoPlayInterval: const Duration(seconds: 3),
+        enlargeCenterPage: true,
       ),
+      items: images.map((image) {
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 5),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            image: DecorationImage(
+              image: NetworkImage(image),
+              fit: BoxFit.cover,
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }
